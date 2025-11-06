@@ -1,6 +1,6 @@
 # Kioskui
 
-Kioskui is a simple, modern user interface project designed for kiosk systems.
+Kioskui is a simple, system for our upcoming Gaming Kiosk.
 This guide explains how to clone the project, create and push a branch, make commits, submit a pull request (PR), and properly add the included MySQL Connector JAR file using IntelliJ IDEA or Eclipse.
 
 ---
