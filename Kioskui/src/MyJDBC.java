@@ -2,9 +2,9 @@ import java.sql.*;
 
 public class MyJDBC {
     //DB Things
-    public static final String URL = "jdbc:mysql://127.0.0.1:3306/kioskuidb";
+    public static final String URL = "jdbc:mysql://localhost:3306/kioskuidb";
     public static final String USER = "root";
-    public static final String PASSWORD = "IsRaEl123@";
+    public static final String PASSWORD = "11681128";
 
     public static Connection connection = null;
 
