@@ -583,7 +583,7 @@ public class AdminPanelSystem extends JFrame {
         JButton delEquipBtn = createStyledButton("Delete Equipment", 420, 370);
         JButton backBtn = createStyledButton("Back", 420, 410);
 
-        JLabel note = new JLabel("Please Refresh \n first");
+        JLabel note = new JLabel("Please Refresh first");
         note.setForeground(Color.WHITE);
         note.setBounds(300, 410, 200, 30);
         boxPanel.add(note);
