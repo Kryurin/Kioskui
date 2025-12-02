@@ -1,23 +1,46 @@
-public class Product {
-    protected String name;
-    protected String type;
-    protected String id;
-    protected double price;
+public abstract class Product {
+    private String name;
+    private int id;
+    private int quantity;
+    private double price;
 
-    public Product(String name, String type, String id, double price) {
+
+    public Product(String name,int id, int quantity, double price) {
         this.name = name;
-        this.type = type;
         this.id = id;
+        this.quantity = quantity;
         this.price = price;
     }
 
-    public String getName() { return name; }
-    public String getType() { return type; }
-    public String getId() { return id; }
-    public double getPrice() { return price; }
+    public String getName() {
+        return name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+
+    public double getPrice() {
+        return price;
+    }
+
+    public int restock(int qty){
+        if (qty <= 0){
+            return this.quantity;
+        }
+        else {
+            quantity = qty + quantity;
+            return quantity;
+        }
+    }
 
     @Override
     public String toString() {
-        return type + ": " + name + " (ID: " + id + ", Price: P" + String.format("%.2f", price) + ")";
+        return "ID: " + id + ". Name: " + name + ", Quantity: " + quantity + ", Price: P" + String.format("%.2f", price);
     }
 }

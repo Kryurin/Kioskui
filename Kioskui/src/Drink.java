@@ -1,5 +1,24 @@
 public class Drink extends Product {
-    public Drink(String name, String id, double price) {
-        super(name, "Drink", id, price);
+    private String drinkType;
+    private String drinkSizes;
+
+
+    public Drink(String name, int id, int quantity, double price, String drinkType , String drinkSizes) {
+        super(name, id, quantity, price);
+        this.drinkType = drinkType;
+        this.drinkSizes = drinkSizes;
+    }
+
+    public String getDrinkType() {
+        return drinkType;
+    }
+
+    public String getDrinkSizes() {
+        return drinkSizes;
+    }
+
+    public String toString() {
+        return super.toString() + "\n Drink Type: " + drinkType + ", Drink Sizes: " + drinkSizes + "\n";
     }
 }
+

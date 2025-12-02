@@ -1,10 +1,10 @@
 public class Main {
-
     public static void main(String[] args) {
-        //Test Connection
-        MyJDBC.getConnection();
+        ProductManager product = new ProductManager();
+        EquipmentManager equipment = new EquipmentManager();
+        MembershipManager membership = new MembershipManager();
 
-        //can omit it just closes your conn
-        MyJDBC.closeConnection();
+        AdminPanelGUI gui = new AdminPanelGUI(product, equipment, membership);
+        gui.setVisible(true);
     }
 }

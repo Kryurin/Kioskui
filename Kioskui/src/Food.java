@@ -1,5 +1,17 @@
 public class Food extends Product {
-    public Food(String name, String id, double price) {
-        super(name, "Food", id, price);
+    private String foodType;
+
+    public Food(String name, int id, int quantity, double price, String foodType) {
+
+        super(name, id, quantity, price);
+        this.foodType = foodType;
+    }
+
+    public String getFoodType() {
+        return foodType;
+    }
+
+    public String toString() {
+        return super.toString() + "\n Food Type: " + foodType + "\n";
     }
 }
