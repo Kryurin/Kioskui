@@ -10,4 +10,8 @@ public class Food extends Product {
     public String getFoodType() {
         return foodType;
     }
+
+    public String toString() {
+        return super.toString() + "\n Food Type: " + foodType + "\n";
+    }
 }

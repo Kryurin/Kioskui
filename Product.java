@@ -1,4 +1,4 @@
-public class Product {
+public abstract class Product {
     private String name;
     private int id;
     private int quantity;
@@ -41,6 +41,6 @@ public class Product {
 
     @Override
     public String toString() {
-        return name + " (ID: " + id + "), " + " Quantity: " + quantity + ", Price: P" + String.format("%.2f", price);
+        return "ID: " + id + ". Name: " + name + ", Quantity: " + quantity + ", Price: P" + String.format("%.2f", price);
     }
 }
