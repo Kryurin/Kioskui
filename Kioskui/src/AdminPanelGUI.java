@@ -2,6 +2,9 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.util.List;
+import java.time.LocalDate;
 
 public class AdminPanelGUI extends JFrame {
 
@@ -32,6 +35,7 @@ public class AdminPanelGUI extends JFrame {
     private JButton viewMembershipButton;
     private JButton deleteButton;
     private JButton logoutButton;
+    private JButton addMemberButton;
 
     public AdminPanelGUI(ProductManager product, EquipmentManager equipment, MembershipManager membership) {
         this.productManager = product;
@@ -51,6 +55,7 @@ public class AdminPanelGUI extends JFrame {
         cardPanel.add(createMainMenuPanel(), "MAIN");
         cardPanel.add(createProductPanel(), "PRODUCT");
         cardPanel.add(createEquipmentPanel(), "EQUIPMENT");
+        cardPanel.add(createCustomerMembershipPanel(), "CUSTOMER MEMBERSHIP");
         cardPanel.add(createViewPanel(), "VIEW ITEMS");
         cardPanel.add(createDeletePanel(), "DELETE");
         cardPanel.add(createMembershipPanel(), "MEMBERSHIP");
@@ -260,16 +265,19 @@ public class AdminPanelGUI extends JFrame {
         JButton productBtn = createStyledButton("Create Products", centerX, 100);
         JButton equipmentBtn = createStyledButton("Create Equipment", centerX, 170);
         JButton membershipBtn = createStyledButton("Manage Memberships", centerX, 240);
+        JButton customerBtn = createStyledButton("Customer Management", centerX, 270);
         deleteButton = createStyledButton("Delete Items", centerX, 310);
         logoutButton = createStyledButton("Log Out", centerX, 380);
 
         productBtn.addActionListener(e -> cards.show(cardPanel, "PRODUCT"));
         equipmentBtn.addActionListener(e -> cards.show(cardPanel, "EQUIPMENT"));
         membershipBtn.addActionListener(e -> cards.show(cardPanel, "MEMBERSHIP"));
+        customerBtn.addActionListener(e -> cards.show(cardPanel, "CUSTOMER MEMBERSHIP"));
         deleteButton.addActionListener(e -> deleteItems());
         logoutButton.addActionListener(e -> logout());
 
         boxPanel.add(title);
+        boxPanel.add(customerBtn);
         boxPanel.add(productBtn);
         boxPanel.add(equipmentBtn);
         boxPanel.add(membershipBtn);
@@ -703,13 +711,15 @@ public class AdminPanelGUI extends JFrame {
 
         addButton.addActionListener(e -> {
             String name = nameField.getText();
+            String description = descField.getText();
             double value = Double.parseDouble(valueField.getText());
+
             if (name.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter a valid membership name.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            Membership membership = new Membership(name, value);
+            Membership membership = new Membership(name, value, description);
 
             membershipManager.addMembership(membership);
 
@@ -737,6 +747,129 @@ public class AdminPanelGUI extends JFrame {
         boxPanel.add(descField);
         boxPanel.add(addButton);
         boxPanel.add(viewMembershipButton);
+        boxPanel.add(backButton);
+
+        panel.add(boxPanel);
+        return panel;
+    }
+
+    private JPanel createCustomerMembershipPanel() {
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(40, 60, 90));
+        panel.setLayout(null);
+
+        JPanel boxPanel = new JPanel();
+        boxPanel.setBackground(new Color(60, 80, 110));
+        boxPanel.setBorder(new CompoundBorder(
+                new LineBorder(new Color(20, 30, 50), 4),
+                new EmptyBorder(20, 20, 20, 20)
+        ));
+        boxPanel.setLayout(null);
+        boxPanel.setBounds(50, 50, 700, 500);
+
+        JLabel title = new JLabel("ADD CUSTOMER MEMBERSHIP", SwingConstants.CENTER);
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("Consolas", Font.BOLD, 20));
+        title.setBounds(150, 10, 400, 30);
+
+        // Fields
+        JTextField customerNameField = new JTextField();
+        JComboBox<Membership> membershipDropdown = new JComboBox<>();
+        JTextField startDateField = new JTextField();
+        JTextField expirationDateField = new JTextField();
+        JTextField contactField = new JTextField();
+
+        customerNameField.setBounds(300, 100, 200, 30);
+        membershipDropdown.setBounds(300, 150, 200, 30);
+        startDateField.setBounds(300, 200, 200, 30);
+        expirationDateField.setBounds(300, 250, 200, 30);
+        contactField.setBounds(300, 300, 200, 30);
+
+        // Labels
+        JLabel nameLabel = new JLabel("Customer Name:");
+        JLabel membershipLabel = new JLabel("Membership:");
+        JLabel startLabel = new JLabel("Start Date (YYYY-MM-DD):");
+        JLabel expLabel = new JLabel("Expiration Date (YYYY-MM-DD):");
+        JLabel contactLabel = new JLabel("Contact Info:");
+
+        nameLabel.setForeground(Color.WHITE);
+        membershipLabel.setForeground(Color.WHITE);
+        startLabel.setForeground(Color.WHITE);
+        expLabel.setForeground(Color.WHITE);
+        contactLabel.setForeground(Color.WHITE);
+
+        nameLabel.setBounds(120, 100, 180, 30);
+        membershipLabel.setBounds(120, 150, 180, 30);
+        startLabel.setBounds(120, 200, 180, 30);
+        expLabel.setBounds(120, 250, 180, 30);
+        contactLabel.setBounds(120, 300, 180, 30);
+
+        // Buttons
+        JButton addButton = createStyledButton("Add Customer Membership", 200, 350);
+        JButton backButton = createStyledButton("Back", 400, 350);
+
+        // Load memberships into dropdown
+        MembershipDAO membershipDAO = new MembershipDAO();
+        List<Membership> memberships = membershipDAO.getAllMemberships();
+        for (Membership m : memberships) {
+            membershipDropdown.addItem(m);
+        }
+
+        // Action: Add Customer Membership
+        addButton.addActionListener(e -> {
+            String customerName = customerNameField.getText().trim();
+            Membership selectedMembership = (Membership) membershipDropdown.getSelectedItem();
+            String startDateStr = startDateField.getText().trim();
+            String expirationDateStr = expirationDateField.getText().trim();
+            String contact = contactField.getText().trim();
+
+            if (customerName.isEmpty() || selectedMembership == null || startDateStr.isEmpty() || expirationDateStr.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                LocalDate startDate = LocalDate.parse(startDateStr);
+                LocalDate expirationDate = LocalDate.parse(expirationDateStr);
+
+                CustomerMembership cm = new CustomerMembership(customerName, selectedMembership, startDate, expirationDate, contact);
+
+                // Add to database
+                CustomerMembershipDAO cmDAO = new CustomerMembershipDAO();
+                cmDAO.addCustomerMembership(cm);
+
+                // Generate PDF card
+                CustomerMembershipCardGenerator.generateCard(cm);
+
+                JOptionPane.showMessageDialog(this, "Customer membership added and card generated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                // Clear fields
+                customerNameField.setText("");
+                startDateField.setText("");
+                expirationDateField.setText("");
+                contactField.setText("");
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid date format. Use YYYY-MM-DD.", "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        });
+
+        backButton.addActionListener(e -> cards.show(cardPanel, "MAIN"));
+
+        // Add components to boxPanel
+        boxPanel.add(title);
+        boxPanel.add(nameLabel);
+        boxPanel.add(customerNameField);
+        boxPanel.add(membershipLabel);
+        boxPanel.add(membershipDropdown);
+        boxPanel.add(startLabel);
+        boxPanel.add(startDateField);
+        boxPanel.add(expLabel);
+        boxPanel.add(expirationDateField);
+        boxPanel.add(contactLabel);
+        boxPanel.add(contactField);
+        boxPanel.add(addButton);
         boxPanel.add(backButton);
 
         panel.add(boxPanel);
@@ -908,6 +1041,17 @@ public class AdminPanelGUI extends JFrame {
                     "Confirm Deletion", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 membershipManager.removeMembership(selected.getId());
+
+                String pdfPath = "memberships/" + selected.getName().replaceAll("\\s+", "_") + "_Membership.pdf";
+                File pdfFile = new File(pdfPath);
+                if (pdfFile.exists()) {
+                    if (pdfFile.delete()) {
+                        System.out.println("PDF deleted: " + pdfPath);
+                    } else {
+                        System.out.println("Failed to delete PDF: " + pdfPath);
+                    }
+                }
+
                 refreshLists();
                 JOptionPane.showMessageDialog(panel, "Membership deleted successfully!");
             }

@@ -6,12 +6,13 @@ public class MembershipDAO {
 
     // INSERT
     public void addMembership(Membership m) {
-        String sql = "INSERT INTO membership (name, value) VALUES (?, ?)";
+        String sql = "INSERT INTO membership (name, value, description) VALUES (?, ?, ?)";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, m.getName());
             stmt.setDouble(2, m.getValue());
+            stmt.setString(3, m.getDescription());
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -37,7 +38,8 @@ public class MembershipDAO {
             while (rs.next()) {
                 Membership m = new Membership(
                         rs.getString("name"),
-                        rs.getDouble("value")
+                        rs.getDouble("value"),
+                        rs.getString("description")
                 );
                 m.setId(rs.getInt("id"));
                 list.add(m);
