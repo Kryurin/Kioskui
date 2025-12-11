@@ -17,6 +17,14 @@ public class Drink extends Product {
         return drinkSizes;
     }
 
+    public void setDrinkType(String drinkType) {
+        this.drinkType = drinkType;
+    }
+
+    public void setDrinkSizes(String drinkSizes) {
+        this.drinkSizes = drinkSizes;
+    }
+
     public String toString() {
         return super.toString() + "\n Drink Type: " + drinkType + ", Drink Sizes: " + drinkSizes + "\n";
     }

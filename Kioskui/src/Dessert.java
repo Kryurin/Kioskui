@@ -16,6 +16,14 @@ public class Dessert extends Product {
         return servingSize;
     }
 
+    public void setDessertType(String dessertType) {
+        this.dessertType = dessertType;
+    }
+
+    public void setServingSize(String servingSize) {
+        this.servingSize = servingSize;
+    }
+
     public String toString() {
          return super.toString() + "\n Dessert Type: " + dessertType + ", Serving Size: " + servingSize + "\n";
     }
