@@ -33,9 +33,13 @@ public class Equipment {
         this.description = description;
     }
 
+    public String toListString() {
+        return "Name: " + name + ", Description: " + description;
+    }
+
     @Override
     public String toString() {
-        return "Name: " + name + ", Description: " + description;
+        return toListString();
     }
 
 }

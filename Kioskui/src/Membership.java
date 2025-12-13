@@ -44,8 +44,11 @@ public class Membership {
 
     @Override
         public String toString() {
-            return "Name: " + name + " Value: " + value;
+            return "Name: " + name + "\nValue: " + value + "\nDescription: " + description + "\n";
         }
 
+        public String toListString() {
+            return "Name: " + name + ", Value: " + value + ", Description: " + description;
+        }
     }
 

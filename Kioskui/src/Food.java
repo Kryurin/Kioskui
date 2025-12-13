@@ -11,7 +11,9 @@ public class Food extends Product {
         return foodType;
     }
 
-    public String toString() {
-        return super.toString() + "\n Food Type: " + foodType + "\n";
+
+    @Override
+    public String toListString() {
+        return super.toListString() + ", Food Type: " + foodType;
     }
 }

@@ -3,17 +3,29 @@ import java.util.List;
 public class EquipmentManager {
 
     private EquipmentDAO dao = new EquipmentDAO();
+    private List<Equipment> equipments;  // cache
 
-    public void addEquipment(Equipment e) {
-        dao.addEquipment(e);
+    public void loadEquipments() {
+        this.equipments = dao.getAllEquipments();
     }
 
     public List<Equipment> getEquipments() {
-        return dao.getAllEquipments();
+        if (equipments == null) loadEquipments();
+        return equipments;
+    }
+
+    public void setEquipments(List<Equipment> equipments) {
+        this.equipments = equipments;
+    }
+
+    public void addEquipment(Equipment e) {
+        dao.addEquipment(e);
+        loadEquipments();  // refresh cache
     }
 
     public void removeEquipment(int id) {
         dao.deleteById(id);
+        loadEquipments();  // refresh cache
     }
 
     public String display() {

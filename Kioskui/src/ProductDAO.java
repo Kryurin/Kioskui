@@ -121,4 +121,46 @@ public class ProductDAO {
         }
     }
 
+    public void updateProduct(Product p) {
+        String sql = "UPDATE products SET name = ?, quantity = ?, price = ?, " +
+                "dessertType = ?, servingSize = ?, drinkType = ?, drinkSizes = ?, foodType = ? " +
+                "WHERE id = ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, p.getName());
+            stmt.setInt(2, p.getQuantity());
+            stmt.setDouble(3, p.getPrice());
+
+            if (p instanceof Food f) {
+                stmt.setString(4, null); // dessertType
+                stmt.setString(5, null); // servingSize
+                stmt.setString(6, null); // drinkType
+                stmt.setString(7, null); // drinkSizes
+                stmt.setString(8, f.getFoodType());
+            } else if (p instanceof Drink d) {
+                stmt.setString(4, null); // dessertType
+                stmt.setString(5, null); // servingSize
+                stmt.setString(6, d.getDrinkType());
+                stmt.setString(7, d.getDrinkSizes());
+                stmt.setString(8, null); // foodType
+            } else if (p instanceof Dessert d) {
+                stmt.setString(4, d.getDessertType());
+                stmt.setString(5, d.getServingSize());
+                stmt.setString(6, null); // drinkType
+                stmt.setString(7, null); // drinkSizes
+                stmt.setString(8, null); // foodType
+            }
+
+            stmt.setInt(9, p.getId()); // WHERE id = ?
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

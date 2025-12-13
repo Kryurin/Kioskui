@@ -65,4 +65,24 @@ public class MembershipDAO {
             ex.printStackTrace();
         }
     }
+
+    // UPDATE
+    public void updateMembership(Membership m) {
+        String sql = "UPDATE membership SET name = ?, value = ?, description = ? WHERE id = ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, m.getName());
+            stmt.setDouble(2, m.getValue());
+            stmt.setString(3, m.getDescription());
+            stmt.setInt(4, m.getId());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
 }

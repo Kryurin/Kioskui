@@ -34,12 +34,12 @@ public class AdminPanelGUI extends JFrame {
     private JList<Membership> editMembershipList;
     private JList<Membership> deleteMembershipList;
 
-
     private JButton viewProductButton = new JButton();
     private JButton viewEquipmentButton = new JButton();
     private JButton editProductButton = new JButton();
     private JButton editEquipmentButton = new JButton();
     private JButton editMembershipButton = new JButton();
+    private JButton customerMembershipButton = new JButton();
     private JButton deleteButton;
     private JButton logoutButton;
 
@@ -65,11 +65,11 @@ public class AdminPanelGUI extends JFrame {
         cardPanel.add(createViewProductPanel(), "VIEW PRODUCTS");
         cardPanel.add(createViewEquipmentPanel(), "VIEW EQUIPMENT");
         cardPanel.add(createViewMembershipPanel(), "VIEW MEMBERSHIPS");
+        cardPanel.add(createViewPanel(), "VIEW");
         cardPanel.add(createEditProductPanel(), "EDIT PRODUCT");
         cardPanel.add(createEditEquipmentPanel(), "EDIT EQUIPMENT");
         cardPanel.add(createEditMembershipPanel(), "EDIT MEMBERSHIP");
         cardPanel.add(createDeletePanel(), "DELETE");
-        cardPanel.add(createCustomerMembershipPanel(), "CUSTOMER MEMBERSHIP");
 
         add(cardPanel);
         cards.show(cardPanel, "LOGIN");
@@ -178,23 +178,24 @@ public class AdminPanelGUI extends JFrame {
     }
 
     private void refreshLists() {
-        productModel.clear();
+        ProductDAO productDAO = new ProductDAO();
+        productManager.setProducts(productDAO.getAllProducts());
+
         List<Product> sortedProducts = otherMethods.sortByQuantity(productManager.getProducts());
-        for (Product p : sortedProducts) {
-            productModel.addElement(p);
-        }
+        productModel.clear();
+        for (Product p : sortedProducts) productModel.addElement(p);
 
-        // --- Equipment ---
+        EquipmentDAO equipmentDAO = new EquipmentDAO();
+        equipmentManager.setEquipments(equipmentDAO.getAllEquipments());
+
         equipmentModel.clear();
-        for (Equipment e : equipmentManager.getEquipments()) {
-            equipmentModel.addElement(e);
-        }
+        for (Equipment eq : equipmentManager.getEquipments()) equipmentModel.addElement(eq);
 
-        // --- Memberships ---
+        MembershipDAO membershipDAO = new MembershipDAO();
+        membershipManager.setMemberships(membershipDAO.getAllMemberships());
+
         membershipModel.clear();
-        for (Membership m : membershipManager.getMemberships()) {
-            membershipModel.addElement(m);
-        }
+        for (Membership m : membershipManager.getMemberships()) membershipModel.addElement(m);
     }
 
     private boolean canProceed(String action) {
@@ -230,6 +231,13 @@ public class AdminPanelGUI extends JFrame {
     private void showViewMembership() {
         membershipArea.setText(membershipManager.display());
         cards.show(cardPanel, "VIEW MEMBERSHIPS");
+    }
+
+    private void showViewPanel() {
+        if (canProceed("view")) return;
+
+        refreshLists();
+        cards.show(cardPanel, "VIEW");
     }
 
     private void showEditProducts() {
@@ -270,7 +278,7 @@ public class AdminPanelGUI extends JFrame {
         );
 
         if (confirm == JOptionPane.YES_OPTION) {
-            CashierPanelGUI orderPanel = new CashierPanelGUI(productManager, equipmentManager, membershipManager);
+            StartMenu orderPanel = new StartMenu();
             orderPanel.setVisible(true);
 
             this.dispose();
@@ -303,10 +311,11 @@ public class AdminPanelGUI extends JFrame {
         int centerX = (panelWidth - buttonWidth) / 2;
 
         JButton productBtn = createStyledButton("Create Products", centerX, 100);
-        JButton equipmentBtn = createStyledButton("Create Equipment", centerX, 170);
-        JButton membershipBtn = createStyledButton("Manage Memberships", centerX, 240);
-        deleteButton = createStyledButton("Delete Items", centerX, 310);
-        logoutButton = createStyledButton("Log Out", centerX, 380);
+        JButton equipmentBtn = createStyledButton("Create Equipment", centerX, 150);
+        JButton membershipBtn = createStyledButton("Manage Memberships", centerX, 200);
+        JButton viewBtn = createStyledButton("View Items", centerX, 250);
+        deleteButton = createStyledButton("Delete Items", centerX, 300);
+        logoutButton = createStyledButton("Log Out", centerX, 350);
 
         viewProductButton.addActionListener(e -> showViewProducts());
         viewEquipmentButton.addActionListener(e -> showViewEquipment());
@@ -317,6 +326,7 @@ public class AdminPanelGUI extends JFrame {
         productBtn.addActionListener(e -> cards.show(cardPanel, "PRODUCT"));
         equipmentBtn.addActionListener(e -> cards.show(cardPanel, "EQUIPMENT"));
         membershipBtn.addActionListener(e -> cards.show(cardPanel, "MEMBERSHIP"));
+        viewBtn.addActionListener(e -> showViewPanel());
         deleteButton.addActionListener(e -> deleteItems());
         logoutButton.addActionListener(e -> logout());
 
@@ -324,6 +334,7 @@ public class AdminPanelGUI extends JFrame {
         boxPanel.add(productBtn);
         boxPanel.add(equipmentBtn);
         boxPanel.add(membershipBtn);
+        boxPanel.add(viewBtn);
         boxPanel.add(deleteButton);
         boxPanel.add(logoutButton);
 
@@ -830,6 +841,13 @@ public class AdminPanelGUI extends JFrame {
         panel.setBackground(new Color(40, 60, 90));
         panel.setLayout(null);
 
+        productArea.setEditable(false);
+        productArea.setText(productManager.display());
+        productArea.setFont(new Font("Dialog", Font.PLAIN, 14));
+
+        JScrollPane scroll = new JScrollPane(productArea);
+        scroll.setBounds(50, 70, 600, 300);
+
         JPanel boxPanel = new JPanel();
         boxPanel.setBackground(new Color(60, 80, 110));
         boxPanel.setBorder(new CompoundBorder(new LineBorder(new Color(20, 30, 50), 4),
@@ -842,15 +860,10 @@ public class AdminPanelGUI extends JFrame {
         title.setFont(new Font("Consolas", Font.BOLD, 24));
         title.setBounds(200, 10, 300, 30);
 
-        productArea.setEditable(false);
-        productArea.setText(productManager.display());
-        productArea.setFont(new Font("Dialog", Font.PLAIN, 14));
-
-        JScrollPane scroll = new JScrollPane(productArea);
-        scroll.setBounds(50, 70, 600, 300);
-
         JButton backButton = createStyledButton("Back", 270, 380);
         backButton.addActionListener(e -> cards.show(cardPanel, "PRODUCT"));
+
+        refreshLists();
 
         boxPanel.add(title);
         boxPanel.add(scroll);
@@ -872,11 +885,6 @@ public class AdminPanelGUI extends JFrame {
         boxPanel.setLayout(null);
         boxPanel.setBounds(50, 50, 700, 450);
 
-        JLabel title = new JLabel("VIEW EQUIPMENT", SwingConstants.CENTER);
-        title.setForeground(Color.WHITE);
-        title.setFont(new Font("Consolas", Font.BOLD, 24));
-        title.setBounds(200, 10, 300, 30);
-
         equipmentArea.setEditable(false);
         equipmentArea.setText(equipmentManager.display());
         equipmentArea.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -884,8 +892,15 @@ public class AdminPanelGUI extends JFrame {
         JScrollPane scroll = new JScrollPane(equipmentArea);
         scroll.setBounds(50, 70, 600, 300);
 
+        JLabel title = new JLabel("VIEW EQUIPMENT", SwingConstants.CENTER);
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("Consolas", Font.BOLD, 24));
+        title.setBounds(200, 10, 300, 30);
+
         JButton backButton = createStyledButton("Back", 270, 380);
         backButton.addActionListener(e -> cards.show(cardPanel, "EQUIPMENT"));
+
+        refreshLists();
 
         boxPanel.add(title);
         boxPanel.add(scroll);
@@ -907,11 +922,6 @@ public class AdminPanelGUI extends JFrame {
         boxPanel.setLayout(null);
         boxPanel.setBounds(50, 50, 700, 450);
 
-        JLabel title = new JLabel("VIEW MEMBERSHIPS", SwingConstants.CENTER);
-        title.setForeground(Color.WHITE);
-        title.setFont(new Font("Consolas", Font.BOLD, 24));
-        title.setBounds(200, 10, 300, 30);
-
         membershipArea.setEditable(false);
         membershipArea.setText(membershipManager.display());
         membershipArea.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -919,14 +929,63 @@ public class AdminPanelGUI extends JFrame {
         JScrollPane scroll = new JScrollPane(membershipArea);
         scroll.setBounds(50, 70, 600, 300);
 
+        JLabel title = new JLabel("VIEW MEMBERSHIPS", SwingConstants.CENTER);
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("Consolas", Font.BOLD, 24));
+        title.setBounds(200, 10, 300, 30);
+
         JButton backButton = createStyledButton("Back", 270, 380);
         backButton.addActionListener(e -> cards.show(cardPanel, "MEMBERSHIP"));
+
+        refreshLists();
 
         boxPanel.add(title);
         boxPanel.add(scroll);
         boxPanel.add(backButton);
         panel.add(boxPanel);
 
+        return panel;
+    }
+
+    private JPanel createViewPanel() {
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(40, 60, 90));
+        panel.setLayout(null);
+
+        JPanel boxPanel = new JPanel();
+        boxPanel.setBackground(new Color(60, 80, 110));
+        boxPanel.setBorder(new CompoundBorder(
+                new LineBorder(new Color(20, 30, 50), 4),
+                new EmptyBorder(20, 20, 20, 20)
+        ));
+        boxPanel.setLayout(null);
+        boxPanel.setBounds(50, 50, 700, 450);
+
+        JLabel title = new JLabel("VIEW ITEMS", SwingConstants.CENTER);
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("Consolas", Font.BOLD, 20));
+        title.setBounds(250, 10, 200, 30);
+
+        refreshLists();
+
+        viewProductButton = createStyledButton("View Products", 100, 100);
+        viewProductButton.addActionListener(e -> showViewProducts());
+        viewEquipmentButton = createStyledButton("View Equipment", 400, 100);
+        viewEquipmentButton.addActionListener(e -> showViewEquipment());
+        JButton viewMembershipButton = createStyledButton("View Memberships", 100, 250);
+        viewMembershipButton.addActionListener(e -> showViewMembership());
+
+        JButton backButton = createStyledButton("Back", 400, 250);
+        backButton.addActionListener(e -> cards.show(cardPanel, "MAIN"));
+
+        // Add components to boxPanel
+        boxPanel.add(title);
+        boxPanel.add(viewProductButton);
+        boxPanel.add(viewEquipmentButton);
+        boxPanel.add(viewMembershipButton);
+        boxPanel.add(backButton);
+
+        panel.add(boxPanel);
         return panel;
     }
 
@@ -985,29 +1044,35 @@ public class AdminPanelGUI extends JFrame {
 
         refreshLists();
 
-        // --- Selection listener ---
         editProductList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 Product selected = editProductList.getSelectedValue();
                 if (selected != null) {
+                    // Set common fields
                     nameField.setText(selected.getName());
                     quantityField.setText(String.valueOf(selected.getQuantity()));
                     priceField.setText(String.valueOf(selected.getPrice()));
 
-                    // Populate sizeCombo dynamically
-                    sizeCombo.removeAllItems();
-                    if (selected instanceof Drink) {
+                    // Handle sizeCombo visibility and items
+                    sizeCombo.removeAllItems(); // Clear previous items
+                    if (selected instanceof Drink drink) {
                         String[] sizes = {"Small", "Medium", "Large"};
                         for (String s : sizes) sizeCombo.addItem(s);
-                        sizeCombo.setSelectedItem(((Drink) selected).getDrinkSizes());
-                    } else if (selected instanceof Dessert) {
+                        sizeCombo.setSelectedItem(drink.getDrinkSizes());
+                        sizeCombo.setEnabled(true);
+                    } else if (selected instanceof Dessert dessert) {
                         String[] sizes = {"1 Person", "2 Person", "4 Person"};
                         for (String s : sizes) sizeCombo.addItem(s);
-                        sizeCombo.setSelectedItem(((Dessert) selected).getServingSize());
+                        sizeCombo.setSelectedItem(dessert.getServingSize());
+                        sizeCombo.setEnabled(true);
+                    } else { // Food (Meal/Snack)
+                        sizeCombo.setEnabled(false); // Disable size combo
+                        sizeCombo.setSelectedItem(null);
                     }
                 }
             }
         });
+
 
         // --- Save logic ---
         saveButton.addActionListener(e -> {
@@ -1020,8 +1085,9 @@ public class AdminPanelGUI extends JFrame {
             String newName = nameField.getText().trim();
             int newQuantity;
             double newPrice;
-            String newSize = (String) sizeCombo.getSelectedItem();
+            String newSize = sizeCombo.getItemCount() > 0 ? (String) sizeCombo.getSelectedItem() : null;
 
+            // Validate numeric fields
             try {
                 newQuantity = Integer.parseInt(quantityField.getText().trim());
                 newPrice = Double.parseDouble(priceField.getText().trim());
@@ -1030,21 +1096,28 @@ public class AdminPanelGUI extends JFrame {
                 return;
             }
 
-            if (newName.isEmpty() || newQuantity < 0 || newPrice <= 0 || newSize == null) {
+            // Check required fields
+            if (newName.isEmpty() || newQuantity < 0 || newPrice <= 0) {
                 JOptionPane.showMessageDialog(this, "Invalid input. Check all fields.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // --- Price validation using otherMethods ---
-            if (selected instanceof Drink) {
-                Drink drink = (Drink) selected;
+            // --- Handle size for Drink/Dessert ---
+            if (selected instanceof Drink drink) {
+                if (newSize == null) {
+                    JOptionPane.showMessageDialog(this, "Please select a size for the drink.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 if (!otherMethods.validateDrinkPrice(drink, newPrice, newSize, productManager.getProducts())) {
                     JOptionPane.showMessageDialog(this, "Invalid price for the selected drink size!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 drink.setDrinkSizes(newSize);
-            } else if (selected instanceof Dessert) {
-                Dessert dessert = (Dessert) selected;
+            } else if (selected instanceof Dessert dessert) {
+                if (newSize == null) {
+                    JOptionPane.showMessageDialog(this, "Please select a serving size for the dessert.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 if (!otherMethods.validateDessertPrice(dessert, newPrice, newSize, productManager.getProducts())) {
                     JOptionPane.showMessageDialog(this, "Invalid price for the selected serving size!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
@@ -1052,20 +1125,28 @@ public class AdminPanelGUI extends JFrame {
                 dessert.setServingSize(newSize);
             }
 
-            // --- Update product ---
+            // --- Update product fields ---
             selected.setName(newName);
             int diff = newQuantity - selected.getQuantity();
             if (diff > 0) selected.restock(diff);
             else if (diff < 0) selected.reduceQuantity(-diff);
             selected.setPrice(newPrice);
 
-            // --- Sort by quantity ---
+            // --- Update database ---
+            ProductDAO productDAO = new ProductDAO();
+            productDAO.updateProduct(selected);
+
+            productManager.setProducts(productDAO.getAllProducts());
+
+            // --- Refresh JList sorted by quantity ---
             List<Product> sortedProducts = otherMethods.sortByQuantity(productManager.getProducts());
             productModel.clear();
             for (Product p : sortedProducts) productModel.addElement(p);
 
             JOptionPane.showMessageDialog(this, "Product updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshLists();
         });
+
 
         backButton.addActionListener(e -> cards.show(cardPanel, "PRODUCT"));
 
@@ -1164,7 +1245,13 @@ public class AdminPanelGUI extends JFrame {
             selected.setName(newName);
             selected.setDescription(newDescription);
 
+            EquipmentDAO equipmentDAO = new EquipmentDAO();
+            equipmentDAO.updateEquipment(selected);
+
+            equipmentManager.setEquipments(equipmentDAO.getAllEquipments());
+
             JOptionPane.showMessageDialog(this, "Equipment updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshLists();
         });
 
         backButton.addActionListener(e -> cards.show(cardPanel, "EQUIPMENT"));
@@ -1268,13 +1355,19 @@ public class AdminPanelGUI extends JFrame {
                 return;
             }
 
-
             // --- Update Membership ---
             selected.setName(newName);
             selected.setValue(newValue);
             selected.setDescription(newDescription);
 
+            MembershipDAO membershipDAO = new MembershipDAO();
+            membershipDAO.updateMembership(selected);
+
+            membershipManager.setMemberships(membershipDAO.getAllMemberships());
+
             JOptionPane.showMessageDialog(this, "Membership updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            refreshLists();
         });
 
         backButton.addActionListener(e -> cards.show(cardPanel, "MEMBERSHIP"));
@@ -1294,7 +1387,6 @@ public class AdminPanelGUI extends JFrame {
         panel.add(boxPanel);
         return panel;
     }
-
 
     private JPanel createDeletePanel() {
         JPanel panel = new JPanel();
@@ -1321,6 +1413,7 @@ public class AdminPanelGUI extends JFrame {
         productLabel.setBounds(30, 40, 100, 30);
 
         deleteProductList = new JList<>(productModel);
+        deleteProductList.setCellRenderer(new DeleteList());
         JScrollPane productScroll = new JScrollPane(deleteProductList);
         productScroll.setBounds(30, 70, 200, 250);
 
@@ -1342,6 +1435,7 @@ public class AdminPanelGUI extends JFrame {
         equipmentLabel.setBounds(250, 40, 100, 30);
 
         deleteEquipmentList = new JList<>(equipmentModel);
+        deleteEquipmentList.setCellRenderer(new DeleteList());
         JScrollPane equipmentScroll = new JScrollPane(deleteEquipmentList);
         equipmentScroll.setBounds(250, 70, 200, 250);
 
@@ -1363,6 +1457,7 @@ public class AdminPanelGUI extends JFrame {
         membershipLabel.setBounds(470, 40, 120, 30);
 
         deleteMembershipList = new JList<>(membershipModel);
+        deleteMembershipList.setCellRenderer(new DeleteList());
         JScrollPane membershipScroll = new JScrollPane(deleteMembershipList);
         membershipScroll.setBounds(470, 70, 200, 250);
 
@@ -1374,10 +1469,11 @@ public class AdminPanelGUI extends JFrame {
                     "Are you sure you want to delete \"" + selected.getName() + "\"?",
                     "Confirm Deletion", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 membershipManager.removeMembership(selected.getId());
-
                 refreshLists();
             }
         });
+
+        refreshLists();
 
         // --- Back Button ---
         JButton backBtn = createStyledButton("Back", 250, 400);
@@ -1385,6 +1481,7 @@ public class AdminPanelGUI extends JFrame {
 
         // --- Add components ---
         boxPanel.add(title);
+
         boxPanel.add(productLabel);
         boxPanel.add(productScroll);
         boxPanel.add(deleteProductBtn);
@@ -1402,126 +1499,4 @@ public class AdminPanelGUI extends JFrame {
         return panel;
     }
 
-    private JPanel createCustomerMembershipPanel() {
-        JPanel panel = new JPanel();
-        panel.setBackground(new Color(40, 60, 90));
-        panel.setLayout(null);
-
-        JPanel boxPanel = new JPanel();
-        boxPanel.setBackground(new Color(60, 80, 110));
-        boxPanel.setBorder(new CompoundBorder(
-                new LineBorder(new Color(20, 30, 50), 4),
-                new EmptyBorder(20, 20, 20, 20)
-        ));
-        boxPanel.setLayout(null);
-        boxPanel.setBounds(50, 50, 700, 500);
-
-        JLabel title = new JLabel("ADD CUSTOMER MEMBERSHIP", SwingConstants.CENTER);
-        title.setForeground(Color.WHITE);
-        title.setFont(new Font("Consolas", Font.BOLD, 20));
-        title.setBounds(150, 10, 400, 30);
-
-        // Fields
-        JTextField customerNameField = new JTextField();
-        JComboBox<Membership> membershipDropdown = new JComboBox<>();
-        JTextField startDateField = new JTextField();
-        JTextField expirationDateField = new JTextField();
-        JTextField contactField = new JTextField();
-
-        customerNameField.setBounds(300, 100, 200, 30);
-        membershipDropdown.setBounds(300, 150, 200, 30);
-        startDateField.setBounds(300, 200, 200, 30);
-        expirationDateField.setBounds(300, 250, 200, 30);
-        contactField.setBounds(300, 300, 200, 30);
-
-        // Labels
-        JLabel nameLabel = new JLabel("Customer Name:");
-        JLabel membershipLabel = new JLabel("Membership:");
-        JLabel startLabel = new JLabel("Start Date (YYYY-MM-DD):");
-        JLabel expLabel = new JLabel("Expiration Date (YYYY-MM-DD):");
-        JLabel contactLabel = new JLabel("Contact Info:");
-
-        nameLabel.setForeground(Color.WHITE);
-        membershipLabel.setForeground(Color.WHITE);
-        startLabel.setForeground(Color.WHITE);
-        expLabel.setForeground(Color.WHITE);
-        contactLabel.setForeground(Color.WHITE);
-
-        nameLabel.setBounds(120, 100, 180, 30);
-        membershipLabel.setBounds(120, 150, 180, 30);
-        startLabel.setBounds(120, 200, 180, 30);
-        expLabel.setBounds(120, 250, 180, 30);
-        contactLabel.setBounds(120, 300, 180, 30);
-
-        // Buttons
-        JButton addButton = createStyledButton("Add Customer Membership", 200, 350);
-        JButton backButton = createStyledButton("Back", 400, 350);
-
-        // Load memberships into dropdown
-        MembershipDAO membershipDAO = new MembershipDAO();
-        List<Membership> memberships = membershipDAO.getAllMemberships();
-        for (Membership m : memberships) {
-            membershipDropdown.addItem(m);
-        }
-
-        // Action: Add Customer Membership
-        addButton.addActionListener(e -> {
-            String customerName = customerNameField.getText().trim();
-            Membership selectedMembership = (Membership) membershipDropdown.getSelectedItem();
-            String startDateStr = startDateField.getText().trim();
-            String expirationDateStr = expirationDateField.getText().trim();
-            String contact = contactField.getText().trim();
-
-            if (customerName.isEmpty() || selectedMembership == null || startDateStr.isEmpty() || expirationDateStr.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            try {
-                LocalDate startDate = LocalDate.parse(startDateStr);
-                LocalDate expirationDate = LocalDate.parse(expirationDateStr);
-
-                CustomerMembership cm = new CustomerMembership(customerName, selectedMembership, startDate, expirationDate, contact);
-
-                // Add to database
-                CustomerMembershipDAO cmDAO = new CustomerMembershipDAO();
-                cmDAO.addCustomerMembership(cm);
-
-                // Generate PDF card
-                CustomerMembershipCardGenerator.generateCard(cm);
-
-                JOptionPane.showMessageDialog(this, "Customer membership added and card generated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-                // Clear fields
-                customerNameField.setText("");
-                startDateField.setText("");
-                expirationDateField.setText("");
-                contactField.setText("");
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Invalid date format. Use YYYY-MM-DD.", "Error", JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
-            }
-        });
-
-        backButton.addActionListener(e -> cards.show(cardPanel, "MAIN"));
-
-        // Add components to boxPanel
-        boxPanel.add(title);
-        boxPanel.add(nameLabel);
-        boxPanel.add(customerNameField);
-        boxPanel.add(membershipLabel);
-        boxPanel.add(membershipDropdown);
-        boxPanel.add(startLabel);
-        boxPanel.add(startDateField);
-        boxPanel.add(expLabel);
-        boxPanel.add(expirationDateField);
-        boxPanel.add(contactLabel);
-        boxPanel.add(contactField);
-        boxPanel.add(addButton);
-        boxPanel.add(backButton);
-
-        panel.add(boxPanel);
-        return panel;
-    }
 }

@@ -25,8 +25,10 @@ public class Drink extends Product {
         this.drinkSizes = drinkSizes;
     }
 
-    public String toString() {
-        return super.toString() + "\n Drink Type: " + drinkType + ", Drink Sizes: " + drinkSizes + "\n";
+
+    @Override
+    public String toListString() {
+        return super.toListString() + ", Drink Type: " + drinkType + ", Drink Sizes: " + drinkSizes;
     }
 }
 

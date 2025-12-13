@@ -60,9 +60,13 @@ public abstract class Product {
         return quantity;
     }
 
+    public String toListString() {
+        return name + " (Qty: " + quantity + ", P" + String.format("%.2f", price) + ")";
+    }
 
     @Override
     public String toString() {
-        return "Name: " + name + ", Quantity: " + quantity + ", Price: P" + String.format("%.2f", price);
+        return toListString();
     }
+
 }

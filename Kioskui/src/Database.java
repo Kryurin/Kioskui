@@ -5,7 +5,7 @@ public class Database {
 
     private static final String URL = "jdbc:mysql://localhost:3306/kioskuidb";
     private static final String USER = "root";
-    private static final String PASS = "IsRaEl123@";
+    private static final String PASS = "Kimianata19";
 
     public static Connection getConnection() {
         try {

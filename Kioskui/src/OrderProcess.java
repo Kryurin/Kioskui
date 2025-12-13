@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderProcess {
@@ -9,6 +10,16 @@ public class OrderProcess {
                                      List<Equipment> equipments,
                                      DefaultListModel<String> orderModel,
                                      JButton refreshButton) {
+        return placeOrder(parent, products, quantities, equipments, orderModel, refreshButton, null);
+    }
+
+    public static boolean placeOrder(JFrame parent,
+                                     List<Product> products,
+                                     List<Integer> quantities,
+                                     List<Equipment> equipments,
+                                     DefaultListModel<String> orderModel,
+                                     JButton refreshButton,
+                                     OrderQueue kitchenQueue) {
 
         if (orderModel.isEmpty()) {
             JOptionPane.showMessageDialog(parent, "Order is empty. Add products first.",
@@ -66,8 +77,30 @@ public class OrderProcess {
                 products.get(i).reduceQuantity(quantities.get(i));
             }
 
-            JOptionPane.showMessageDialog(parent, "Order placed successfully!",
-                    "Success", JOptionPane.INFORMATION_MESSAGE);
+            // Create and add order to kitchen queue if provided
+            if (kitchenQueue != null) {
+                List<String> orderItems = new ArrayList<>();
+                for (int i = 0; i < products.size(); i++) {
+                    int qty = quantities.get(i);
+                    String productName = products.get(i).getName();
+                    orderItems.add(qty + "x " + productName);
+                }
+                for (Equipment eq : equipments) {
+                    orderItems.add("1x " + eq.getName() + " (Borrowed)");
+                }
+
+                Order order = new Order(orderItems, total);
+                if (kitchenQueue.addOrder(order)) {
+                    JOptionPane.showMessageDialog(parent, "Order #" + order.getOrderId() + " sent to kitchen!",
+                            "Order Queued", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(parent, "Kitchen queue is full! Order created but not queued.",
+                            "Queue Full", JOptionPane.WARNING_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(parent, "Order placed successfully!",
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+            }
 
             // Clear order lists
             orderModel.clear();

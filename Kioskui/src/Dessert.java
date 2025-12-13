@@ -24,7 +24,8 @@ public class Dessert extends Product {
         this.servingSize = servingSize;
     }
 
-    public String toString() {
-         return super.toString() + "\n Dessert Type: " + dessertType + ", Serving Size: " + servingSize + "\n";
+    @Override
+    public String toListString() {
+        return super.toListString() + ", Dessert Type: " + dessertType + ", Serving Size: " + servingSize;
     }
 }

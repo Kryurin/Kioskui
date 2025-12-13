@@ -66,4 +66,24 @@ public class EquipmentDAO {
             ex.printStackTrace();
         }
     }
+
+    // UPDATE
+    public void updateEquipment(Equipment e) {
+        String sql = "UPDATE equipment SET name = ?, description = ? WHERE id = ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, e.getName());
+            stmt.setString(2, e.getDescription());
+            stmt.setInt(3, e.getId());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
 }
