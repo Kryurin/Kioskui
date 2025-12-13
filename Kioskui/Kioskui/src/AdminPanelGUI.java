@@ -7,8 +7,8 @@ import java.time.LocalDate;
 
 public class AdminPanelGUI extends JFrame {
 
-    private static final String ADMIN_USER = "1";
-    private static final String ADMIN_PASS = "1";
+    private static final String ADMIN_USER = "admin";
+    private static final String ADMIN_PASS = "admin123";
 
     private CardLayout cards;
     private JPanel cardPanel;
@@ -849,12 +849,11 @@ public class AdminPanelGUI extends JFrame {
         panel.setBackground(new Color(40, 60, 90));
         panel.setLayout(null);
 
-        JTextArea productAreaPanel = new JTextArea();
-        productAreaPanel.setEditable(false);
-        productAreaPanel.setText(productManager.display());
-        productAreaPanel.setFont(new Font("Dialog", Font.PLAIN, 14));
+        productArea.setEditable(false);
+        productArea.setText(productManager.display());
+        productArea.setFont(new Font("Dialog", Font.PLAIN, 14));
 
-        JScrollPane scroll = new JScrollPane(productAreaPanel);
+        JScrollPane scroll = new JScrollPane(productArea);
         scroll.setBounds(50, 70, 600, 300);
 
         JPanel boxPanel = new JPanel();
@@ -873,6 +872,7 @@ public class AdminPanelGUI extends JFrame {
         backButton.addActionListener(e -> cards.show(cardPanel, "PRODUCT"));
 
         refreshLists();
+        productArea.setText(productManager.display());
 
         boxPanel.add(title);
         boxPanel.add(scroll);
@@ -894,12 +894,11 @@ public class AdminPanelGUI extends JFrame {
         boxPanel.setLayout(null);
         boxPanel.setBounds(50, 50, 700, 450);
 
-        JTextArea equipmentAreaPanel = new JTextArea();
-        equipmentAreaPanel.setEditable(false);
-        equipmentAreaPanel.setText(equipmentManager.display());
-        equipmentAreaPanel.setFont(new Font("Dialog", Font.PLAIN, 14));
+        equipmentArea.setEditable(false);
+        equipmentArea.setText(equipmentManager.display());
+        equipmentArea.setFont(new Font("Dialog", Font.PLAIN, 14));
 
-        JScrollPane scroll = new JScrollPane(equipmentAreaPanel);
+        JScrollPane scroll = new JScrollPane(equipmentArea);
         scroll.setBounds(50, 70, 600, 300);
 
         JLabel title = new JLabel("VIEW EQUIPMENT", SwingConstants.CENTER);
@@ -932,12 +931,11 @@ public class AdminPanelGUI extends JFrame {
         boxPanel.setLayout(null);
         boxPanel.setBounds(50, 50, 700, 450);
 
-        JTextArea membershipAreaPanel = new JTextArea();
-        membershipAreaPanel.setEditable(false);
-        membershipAreaPanel.setText(membershipManager.display());
-        membershipAreaPanel.setFont(new Font("Dialog", Font.PLAIN, 14));
+        membershipArea.setEditable(false);
+        membershipArea.setText(membershipManager.display());
+        membershipArea.setFont(new Font("Dialog", Font.PLAIN, 14));
 
-        JScrollPane scroll = new JScrollPane(membershipAreaPanel);
+        JScrollPane scroll = new JScrollPane(membershipArea);
         scroll.setBounds(50, 70, 600, 300);
 
         JLabel title = new JLabel("VIEW MEMBERSHIPS", SwingConstants.CENTER);
@@ -1535,6 +1533,10 @@ public class AdminPanelGUI extends JFrame {
         JTextField startDateField = new JTextField();
         JTextField expirationDateField = new JTextField();
         JTextField contactField = new JTextField();
+
+        LocalDate today = LocalDate.now();
+        startDateField.setText(String.valueOf(today));
+        expirationDateField.setText(String.valueOf(today.plusYears(1)));
 
         customerNameField.setBounds(300, 100, 200, 30);
         membershipDropdown.setBounds(300, 150, 200, 30);

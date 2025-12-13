@@ -48,7 +48,7 @@ public class ProductDAO {
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     int id = generatedKeys.getInt(1);
-                    p.setId(id);  // you may need to add a protected setter in Product class
+                    p.setId(id);
                 }
             }
 
