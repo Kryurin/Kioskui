@@ -2,8 +2,8 @@ public class Dessert extends Product {
     private String dessertType;
     private String servingSize;
 
-    public Dessert(String name, int quantity, double price, String dessertType ,String servingSize) {
-        super(name, quantity, price);
+    public Dessert(String name, int quantity, double price, String availability, String dessertType, String servingSize) {
+        super(name, quantity, price, availability);
         this.dessertType = dessertType;
         this.servingSize = servingSize;
     }
@@ -24,12 +24,8 @@ public class Dessert extends Product {
         this.servingSize = servingSize;
     }
 
-    public String toString() {
-         return super.toString() + "\n Dessert Type: " + dessertType + "\nServing Size: " + servingSize + "\n";
-    }
-
     @Override
     public String toListString() {
-        return super.toListString() + ", Dessert Type: " + dessertType + ", Serving Size: " + servingSize;
+        return super.toListString() + ", Dessert Type: " + dessertType + ", Serving Size: " + servingSize + "\n";
     }
 }

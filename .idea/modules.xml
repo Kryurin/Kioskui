@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Kioskui.iml" filepath="$PROJECT_DIR$/Kioskui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/membership-app.iml" filepath="$PROJECT_DIR$/membership-app.iml" />
     </modules>
   </component>
 </project>

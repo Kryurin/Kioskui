@@ -35,7 +35,7 @@ public class Equipment {
 
     @Override
     public String toString() {
-        return "Name: " + name + "\nDescription: " + description + "\n";
+        return toListString();
     }
 
     public String toListString() {

@@ -7,8 +7,8 @@ import java.time.LocalDate;
 
 public class AdminPanelGUI extends JFrame {
 
-    private static final String ADMIN_USER = "admin";
-    private static final String ADMIN_PASS = "admin123";
+    private static final String ADMIN_USER = "1";
+    private static final String ADMIN_PASS = "1";
 
     private CardLayout cards;
     private JPanel cardPanel;
@@ -350,17 +350,15 @@ public class AdminPanelGUI extends JFrame {
     }
 
     private JPanel createProductPanel() {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(null);
         panel.setBackground(new Color(40, 60, 90));
-        panel.setLayout(null);
 
-        JPanel boxPanel = new JPanel();
+        JPanel boxPanel = new JPanel(null);
         boxPanel.setBackground(new Color(60, 80, 110));
         boxPanel.setBorder(new CompoundBorder(
                 new LineBorder(new Color(20, 30, 50), 4),
                 new EmptyBorder(20, 20, 20, 20)
         ));
-        boxPanel.setLayout(null);
         boxPanel.setBounds(50, 50, 700, 450);
 
         JLabel title = new JLabel("ADD PRODUCT", SwingConstants.CENTER);
@@ -368,48 +366,48 @@ public class AdminPanelGUI extends JFrame {
         title.setFont(new Font("Consolas", Font.BOLD, 20));
         title.setBounds(250, 10, 200, 30);
 
-        // Fields
+        // -------- Fields --------
         JTextField nameField = new JTextField();
         JTextField quantityField = new JTextField();
         JTextField priceField = new JTextField();
+        JComboBox<String> availabilityBox = new JComboBox<>(new String[]{"Available", "Not Available"});
+        availabilityBox.setVisible(false);
+
         nameField.setBounds(150, 100, 200, 30);
         quantityField.setBounds(150, 150, 200, 30);
+        availabilityBox.setBounds(150, 150, 200, 30);
         priceField.setBounds(150, 200, 200, 30);
 
         JLabel nameLabel = new JLabel("Name:");
-        JLabel quantityLabel = new JLabel("Quantity:");
+        JLabel qtyAvailLabel = new JLabel("Quantity:"); // dynamically changes
         JLabel priceLabel = new JLabel("Price:");
 
-        nameLabel.setForeground(Color.WHITE);
-        quantityLabel.setForeground(Color.WHITE);
-        priceLabel.setForeground(Color.WHITE);
-
         nameLabel.setBounds(50, 100, 100, 30);
-        quantityLabel.setBounds(50, 150, 100, 30);
+        qtyAvailLabel.setBounds(50, 150, 100, 30);
         priceLabel.setBounds(50, 200, 100, 30);
 
-        // Category and dynamic fields
-        String[] categories = {"Food", "Drink", "Dessert"};
-        JComboBox<String> categoryBox = new JComboBox<>(categories);
+        nameLabel.setForeground(Color.WHITE);
+        qtyAvailLabel.setForeground(Color.WHITE);
+        priceLabel.setForeground(Color.WHITE);
+
+        // -------- Category & Dynamic Fields --------
+        JComboBox<String> categoryBox = new JComboBox<>(new String[]{"Food", "Drink", "Dessert"});
         categoryBox.setBounds(150, 250, 200, 30);
         JLabel categoryLabel = new JLabel("Category:");
         categoryLabel.setForeground(Color.WHITE);
         categoryLabel.setBounds(50, 250, 100, 30);
 
         // Food
-        String[] foodTypes = {"Snack", "Meal"};
-        JComboBox<String> foodTypeBox = new JComboBox<>(foodTypes);
+        JComboBox<String> foodTypeBox = new JComboBox<>(new String[]{"Snack", "Meal"});
         foodTypeBox.setBounds(150, 300, 200, 30);
         JLabel foodTypeLabel = new JLabel("Food Type:");
         foodTypeLabel.setForeground(Color.WHITE);
         foodTypeLabel.setBounds(50, 300, 100, 30);
 
         // Drink
-        String[] drinkTypes = {"Soda", "Milk Tea", "Juice"};
-        JComboBox<String> drinkTypeBox = new JComboBox<>(drinkTypes);
+        JComboBox<String> drinkTypeBox = new JComboBox<>(new String[]{"Soda", "Milk Tea", "Juice"});
         drinkTypeBox.setBounds(150, 300, 200, 30);
-        String[] drinkSizes = {"Small", "Medium", "Large"};
-        JComboBox<String> drinkSizeBox = new JComboBox<>(drinkSizes);
+        JComboBox<String> drinkSizeBox = new JComboBox<>(new String[]{"Small", "Medium", "Large"});
         drinkSizeBox.setBounds(150, 350, 200, 30);
         JLabel drinkTypeLabel = new JLabel("Drink Type:");
         drinkTypeLabel.setForeground(Color.WHITE);
@@ -419,11 +417,9 @@ public class AdminPanelGUI extends JFrame {
         drinkSizeLabel.setBounds(50, 350, 100, 30);
 
         // Dessert
-        String[] dessertTypes = {"Cake", "Pudding", "Ice Cream"};
-        JComboBox<String> dessertTypeBox = new JComboBox<>(dessertTypes);
+        JComboBox<String> dessertTypeBox = new JComboBox<>(new String[]{"Cake", "Pudding", "Ice Cream"});
         dessertTypeBox.setBounds(150, 300, 200, 30);
-        String[] dessertServings = {"1 Person", "2 Person", "4 Person"};
-        JComboBox<String> dessertServingBox = new JComboBox<>(dessertServings);
+        JComboBox<String> dessertServingBox = new JComboBox<>(new String[]{"1 Person", "2 Person", "4 Person"});
         dessertServingBox.setBounds(150, 350, 200, 30);
         JLabel dessertTypeLabel = new JLabel("Dessert Type:");
         dessertTypeLabel.setForeground(Color.WHITE);
@@ -432,7 +428,7 @@ public class AdminPanelGUI extends JFrame {
         dessertServingLabel.setForeground(Color.WHITE);
         dessertServingLabel.setBounds(50, 350, 100, 30);
 
-        // Buttons
+        // -------- Buttons --------
         JButton addButton = createStyledButton("Add Product", 450, 200);
         JButton viewProductsBtn = createStyledButton("View Products", 450, 250);
         viewProductsBtn.addActionListener(e -> showViewProducts());
@@ -440,10 +436,18 @@ public class AdminPanelGUI extends JFrame {
         editProductButton.addActionListener(e -> showEditProducts());
         JButton backButton = createStyledButton("Back", 450, 350);
 
-        // Category visibility
-        ActionListener categoryListener = e -> {
-            String cat = (String) categoryBox.getSelectedItem();
+        Runnable showQuantity = () -> {
+            quantityField.setVisible(true);
+            availabilityBox.setVisible(false);
+            qtyAvailLabel.setText("Quantity:");
+        };
+        Runnable showAvailability = () -> {
+            quantityField.setVisible(false);
+            availabilityBox.setVisible(true);
+            qtyAvailLabel.setText("Availability:");
+        };
 
+        ActionListener refreshUI = e -> {
             foodTypeBox.setVisible(false);
             foodTypeLabel.setVisible(false);
             drinkTypeBox.setVisible(false);
@@ -455,174 +459,159 @@ public class AdminPanelGUI extends JFrame {
             dessertTypeLabel.setVisible(false);
             dessertServingLabel.setVisible(false);
 
+            String cat = (String) categoryBox.getSelectedItem();
             switch (cat) {
-                case "Food" -> { foodTypeBox.setVisible(true); foodTypeLabel.setVisible(true); }
-                case "Drink" -> { drinkTypeBox.setVisible(true); drinkSizeBox.setVisible(true); drinkTypeLabel.setVisible(true); drinkSizeLabel.setVisible(true); }
-                case "Dessert" -> { dessertTypeBox.setVisible(true); dessertServingBox.setVisible(true); dessertTypeLabel.setVisible(true); dessertServingLabel.setVisible(true); }
+                case "Food" -> {
+                    foodTypeBox.setVisible(true);
+                    foodTypeLabel.setVisible(true);
+                    showAvailability.run();
+                }
+                case "Drink" -> {
+                    drinkTypeBox.setVisible(true);
+                    drinkTypeLabel.setVisible(true);
+                    drinkSizeBox.setVisible(true);
+                    drinkSizeLabel.setVisible(true);
+                    if ("Milk Tea".equals(drinkTypeBox.getSelectedItem())) showAvailability.run();
+                    else showQuantity.run();
+                }
+                case "Dessert" -> {
+                    dessertTypeBox.setVisible(true);
+                    dessertServingBox.setVisible(true);
+                    dessertTypeLabel.setVisible(true);
+                    dessertServingLabel.setVisible(true);
+                    showQuantity.run(); }
             }
         };
-        categoryBox.addActionListener(categoryListener);
-        categoryListener.actionPerformed(null);
+        categoryBox.addActionListener(refreshUI);
+        drinkTypeBox.addActionListener(refreshUI);
+        refreshUI.actionPerformed(null);
 
+        // -------- Add Button Logic --------
         addButton.addActionListener(e -> {
             try {
                 String category = (String) categoryBox.getSelectedItem();
                 String name = nameField.getText().trim();
-                int quantity = Integer.parseInt(quantityField.getText().trim());
-                double price = Double.parseDouble(priceField.getText().trim());
+                String priceText = priceField.getText().trim();
+
+                if (name.isEmpty() || priceText.isEmpty() || (quantityField.isVisible() && quantityField.getText().trim().isEmpty())) {
+                    JOptionPane.showMessageDialog(this, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                double price = Double.parseDouble(priceText);
+                int quantity;
+                String availability;
+
+                if (availabilityBox.isVisible()) {
+                    availability = availabilityBox.getSelectedItem().toString();
+                    quantity = availability.equals("Available") ? 50 : 0;
+                } else {
+                    availability = "Available";
+                    quantity = Integer.parseInt(quantityField.getText().trim());
+                }
+
                 boolean invalid = false;
                 String errorMsg = "";
 
                 switch (category) {
                     case "Food" -> {
-
-                        if (quantity <= 10){
-                            invalid = true;
-                            errorMsg = "Product must be greater than 10.";
-                            break;
-                        }
-
-                        if (price <= 10){
-                            invalid = true;
-                            errorMsg = "Product Price must be greater than Php 10.00.";
-                            break;
-                        }
-
+                        if (quantity <= 10) { invalid = true; errorMsg = "Product must be greater than 10."; break; }
+                        if (price <= 10) { invalid = true; errorMsg = "Product Price must be greater than Php 10.00."; break; }
                         for (Product p : productManager.getProducts()) {
-                            if (p.getName().equalsIgnoreCase(name)) {
-                                invalid = true;
-                                errorMsg = "Food name already exists in the system!";
-                                break;
-                            }
+                            if (p.getName().equalsIgnoreCase(name)) { invalid = true; errorMsg = "Food name already exists!"; break; }
                         }
-                        if (!invalid) {
-                            Product product = new Food(name, quantity, price, (String) foodTypeBox.getSelectedItem());
-                            productManager.addProduct(product);
-                        }
+                        if (!invalid) productManager.addProduct(new Food(name, quantity, price, availability, (String) foodTypeBox.getSelectedItem()));
                     }
                     case "Drink" -> {
                         String type = (String) drinkTypeBox.getSelectedItem();
                         String size = (String) drinkSizeBox.getSelectedItem();
 
-                        if (quantity <= 10) {
-                            invalid = true;
-                            errorMsg = "Drink quantity must be greater than Php 10.00.";
-                        }
-
-                        if (price <= 10) {
-                            invalid = true;
-                            errorMsg = "Drink price must be greater than Php 10.00.";
-                        }
+                        if (quantity <= 10) { invalid = true; errorMsg = "Drink quantity must be greater than 10."; }
+                        if (price <= 10) { invalid = true; errorMsg = "Drink price must be greater than Php 10.00."; }
 
                         for (Product p : productManager.getProducts()) {
-                            if (p instanceof Drink d) {
-                                if (d.getName().equalsIgnoreCase(name)) {
+                            if (p instanceof Drink d && d.getName().equalsIgnoreCase(name)) {
+                                if (!d.getDrinkType().equals(type)) { invalid = true; errorMsg = "A drink with this name exists but with a different type!"; break; }
+                                if (d.getDrinkType().equals(type) && d.getDrinkSizes().equals(size)) { invalid = true; errorMsg = "A drink with this name, type, and size already exists!"; break; }
+                                if (d.getDrinkType().equals(type) && !d.getDrinkSizes().equals(size) && d.getPrice() == price) { invalid = true; errorMsg = "A drink with the same name and price but different size is invalid!"; break; }
+                            } else if (!(p instanceof Drink) && p.getName().equalsIgnoreCase(name)) { invalid = true; errorMsg = "This name already exists in another category!"; break; }
+                        }
 
-                                    if (!d.getDrinkType().equals(type)) {
+                        // ===== SIZE PRICE LOGIC =====
+                        for (Product p : productManager.getProducts()) {
+                            if (p instanceof Drink d && d.getDrinkType().equals(type)) {
+                                String otherSize = d.getDrinkSizes();
+                                double otherPrice = d.getPrice();
+
+                                if (size.equalsIgnoreCase("Small")) {
+                                    if ((otherSize.equalsIgnoreCase("Medium") || otherSize.equalsIgnoreCase("Large")) && price >= otherPrice) {
                                         invalid = true;
-                                        errorMsg = "A drink with this name exists but with a different type!";
+                                        errorMsg = "Small drink price must be less than Medium and Large!";
                                         break;
                                     }
-                                    if (d.getDrinkType().equals(type) && d.getDrinkSizes().equals(size)) {
+                                } else if (size.equalsIgnoreCase("Medium")) {
+                                    if (otherSize.equalsIgnoreCase("Small") && price <= otherPrice) {
                                         invalid = true;
-                                        errorMsg = "A drink with this name, type, and size already exists!";
+                                        errorMsg = "Medium drink price must be greater than Small!";
                                         break;
                                     }
-                                    if (d.getDrinkType().equals(type) && !d.getDrinkSizes().equals(size) && d.getPrice() == price) {
+                                    if (otherSize.equalsIgnoreCase("Large") && price >= otherPrice) {
                                         invalid = true;
-                                        errorMsg = "A drink with the same name and price but different size is invalid!";
+                                        errorMsg = "Medium drink price must be less than Large!";
+                                        break;
+                                    }
+                                } else if (size.equalsIgnoreCase("Large")) {
+                                    if ((otherSize.equalsIgnoreCase("Small") || otherSize.equalsIgnoreCase("Medium")) && price <= otherPrice) {
+                                        invalid = true;
+                                        errorMsg = "Large drink price must be greater than Small and Medium!";
                                         break;
                                     }
                                 }
-                            } else if (!(p instanceof Drink) && p.getName().equalsIgnoreCase(name)) {
-                                invalid = true;
-                                errorMsg = "This name already exists in another category!";
-                                break;
                             }
                         }
-
-                        if (!invalid) {
-                            Product product = new Drink(name, quantity, price, type, size);
-                            productManager.addProduct(product);
-                        }
+                        if (!invalid) productManager.addProduct(new Drink(name, quantity, price, availability, type, size));
                     }
                     case "Dessert" -> {
                         String type = (String) dessertTypeBox.getSelectedItem();
                         String serving = (String) dessertServingBox.getSelectedItem();
 
-                        if (quantity <= 10) {
-                            invalid = true;
-                            errorMsg = "Dessert quantity must be greater than Php 10.00.";
-                        }
-
-                        if (price <= 10) {
-                            invalid = true;
-                            errorMsg = "Dessert price must be greater than Php 10.00.";
-                        }
+                        if (quantity <= 10) { invalid = true; errorMsg = "Dessert quantity must be greater than 10."; }
+                        if (price <= 10) { invalid = true; errorMsg = "Dessert price must be greater than Php 10.00."; }
 
                         for (Product p : productManager.getProducts()) {
-                            if (p instanceof Dessert d) {
-                                if (d.getName().equalsIgnoreCase(name)) {
-                                    if (!d.getDessertType().equals(type)) {
-                                        invalid = true;
-                                        errorMsg = "A dessert with this name exists but with a different type!";
-                                        break;
-                                    }
-                                    if (d.getDessertType().equals(type) && d.getServingSize().equals(serving)) {
-                                        invalid = true;
-                                        errorMsg = "A dessert with this name, type, and serving already exists!";
-                                        break;
-                                    }
-                                    if (d.getDessertType().equals(type) && !d.getServingSize().equals(serving) && d.getPrice() == price) {
-                                        invalid = true;
-                                        errorMsg = "A dessert with the same name and price but different serving is invalid!";
-                                        break;
-                                    }
-                                }
-                            } else if (!(p instanceof Dessert) && p.getName().equalsIgnoreCase(name)) {
-                                invalid = true;
-                                errorMsg = "This name already exists in another category!";
-                                break;
-                            }
+                            if (p instanceof Dessert d && d.getName().equalsIgnoreCase(name)) {
+                                if (!d.getDessertType().equals(type)) { invalid = true; errorMsg = "A dessert with this name exists but with a different type!"; break; }
+                                if (d.getDessertType().equals(type) && d.getServingSize().equals(serving)) { invalid = true; errorMsg = "A dessert with this name, type, and serving already exists!"; break; }
+                                if (d.getDessertType().equals(type) && !d.getServingSize().equals(serving) && d.getPrice() == price) { invalid = true; errorMsg = "A dessert with the same name and price but different serving is invalid!"; break; }
+
+                            } else if (!(p instanceof Dessert) && p.getName().equalsIgnoreCase(name)) { invalid = true; errorMsg = "This name already exists in another category!"; break; }
+
                         }
 
-                        if (!invalid) {
-                            Product product = new Dessert(name, quantity, price, type, serving);
-                            productManager.addProduct(product);
-                        }
+                        if (!invalid) productManager.addProduct(new Dessert(name, quantity, price, availability, type, serving));
                     }
                 }
 
-                if (invalid) {
-                    JOptionPane.showMessageDialog(this, errorMsg, "Invalid Product", JOptionPane.ERROR_MESSAGE);
-                } else {
+                if (invalid) JOptionPane.showMessageDialog(this, errorMsg, "Invalid Product", JOptionPane.ERROR_MESSAGE);
+                else {
                     JOptionPane.showMessageDialog(this, category + " " + name + " added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-                    if (category.equals("Food")) {
-                        nameField.setText("");
-                        quantityField.setText("");
-                        priceField.setText("");
-                        foodTypeBox.setSelectedIndex(0);
-                    }
+                    nameField.setText(""); quantityField.setText(""); priceField.setText("");
                 }
 
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Please enter valid numeric inputs for quantity and price.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-            finally {
-                System.out.println("Attempted to add Product");
-            }
         });
-
 
         backButton.addActionListener(e -> cards.show(cardPanel, "MAIN"));
 
-        // Add all components
+        // -------- Add all components --------
         boxPanel.add(title);
         boxPanel.add(nameLabel);
         boxPanel.add(nameField);
-        boxPanel.add(quantityLabel);
+        boxPanel.add(qtyAvailLabel);
         boxPanel.add(quantityField);
+        boxPanel.add(availabilityBox);
         boxPanel.add(priceLabel);
         boxPanel.add(priceField);
         boxPanel.add(categoryLabel);
@@ -1025,63 +1014,77 @@ public class AdminPanelGUI extends JFrame {
 
         // --- Labels ---
         JLabel nameLabel = new JLabel("Name:");
-        JLabel quantityLabel = new JLabel("Quantity:");
+        JLabel qtyAvailLabel = new JLabel("Quantity / Availability:");
         JLabel priceLabel = new JLabel("Price:");
         JLabel sizeLabel = new JLabel("Size:");
         nameLabel.setForeground(Color.WHITE);
-        quantityLabel.setForeground(Color.WHITE);
+        qtyAvailLabel.setForeground(Color.WHITE);
         priceLabel.setForeground(Color.WHITE);
         sizeLabel.setForeground(Color.WHITE);
-        nameLabel.setBounds(350, 80, 100, 30);
-        quantityLabel.setBounds(350, 130, 100, 30);
-        priceLabel.setBounds(350, 180, 100, 30);
-        sizeLabel.setBounds(350, 230, 100, 30);
+        nameLabel.setBounds(350, 50, 120, 30);
+        qtyAvailLabel.setBounds(350, 100, 150, 30);
+        priceLabel.setBounds(350, 150, 100, 30);
+        sizeLabel.setBounds(350, 200, 100, 30);
 
         // --- Input fields ---
         JTextField nameField = new JTextField();
         JTextField quantityField = new JTextField();
+        JComboBox<String> availabilityBox = new JComboBox<>(new String[]{"Available", "Not Available"});
         JTextField priceField = new JTextField();
         JComboBox<String> sizeCombo = new JComboBox<>();
-        nameField.setBounds(450, 80, 200, 30);
-        quantityField.setBounds(450, 130, 200, 30);
-        priceField.setBounds(450, 180, 200, 30);
-        sizeCombo.setBounds(450, 230, 200, 30);
+
+        nameField.setBounds(450, 50, 200, 30);
+        quantityField.setBounds(480, 100, 200, 30);
+        availabilityBox.setBounds(480, 100, 200, 30);
+        priceField.setBounds(450, 150, 200, 30);
+        sizeCombo.setBounds(450, 200, 200, 30);
+        availabilityBox.setVisible(false); // hidden by default
 
         // --- Buttons ---
         JButton saveButton = createStyledButton("Save Changes", 350, 350);
-        JButton backButton =createStyledButton("Back", 350, 400);
+        JButton backButton = createStyledButton("Back", 350, 400);
 
         refreshLists();
 
+        // --- List selection logic ---
         editProductList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 Product selected = editProductList.getSelectedValue();
                 if (selected != null) {
-                    // Set common fields
                     nameField.setText(selected.getName());
-                    quantityField.setText(String.valueOf(selected.getQuantity()));
                     priceField.setText(String.valueOf(selected.getPrice()));
 
-                    // Handle sizeCombo visibility and items
-                    sizeCombo.removeAllItems(); // Clear previous items
+                    // Determine whether to show quantity or availability
+                    boolean showAvailability = (selected instanceof Food)
+                            || (selected instanceof Drink d && d.getDrinkType().equalsIgnoreCase("Milk Tea"));
+
+                    if (showAvailability) {
+                        quantityField.setVisible(false);
+                        availabilityBox.setVisible(true);
+                        availabilityBox.setSelectedItem(selected.getAvailability());
+                    } else {
+                        quantityField.setVisible(true);
+                        availabilityBox.setVisible(false);
+                        quantityField.setText(String.valueOf(selected.getQuantity()));
+                    }
+
+                    // Handle size combo for Drink/Dessert
+                    sizeCombo.removeAllItems();
                     if (selected instanceof Drink drink) {
-                        String[] sizes = {"Small", "Medium", "Large"};
-                        for (String s : sizes) sizeCombo.addItem(s);
+                        for (String s : new String[]{"Small", "Medium", "Large"}) sizeCombo.addItem(s);
                         sizeCombo.setSelectedItem(drink.getDrinkSizes());
                         sizeCombo.setEnabled(true);
                     } else if (selected instanceof Dessert dessert) {
-                        String[] sizes = {"1 Person", "2 Person", "4 Person"};
-                        for (String s : sizes) sizeCombo.addItem(s);
+                        for (String s : new String[]{"1 Person", "2 Person", "4 Person"}) sizeCombo.addItem(s);
                         sizeCombo.setSelectedItem(dessert.getServingSize());
                         sizeCombo.setEnabled(true);
-                    } else { // Food (Meal/Snack)
-                        sizeCombo.setEnabled(false); // Disable size combo
+                    } else { // Food
+                        sizeCombo.setEnabled(false);
                         sizeCombo.setSelectedItem(null);
                     }
                 }
             }
         });
-
 
         // --- Save logic ---
         saveButton.addActionListener(e -> {
@@ -1092,70 +1095,74 @@ public class AdminPanelGUI extends JFrame {
             }
 
             String newName = nameField.getText().trim();
-            int newQuantity;
             double newPrice;
             String newSize = sizeCombo.getItemCount() > 0 ? (String) sizeCombo.getSelectedItem() : null;
 
-            // Validate numeric fields
-            try {
-                newQuantity = Integer.parseInt(quantityField.getText().trim());
-                newPrice = Double.parseDouble(priceField.getText().trim());
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Please enter valid numeric values for price and quantity.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+            boolean showAvailability = availabilityBox.isVisible();
+            int newQuantity = selected.getQuantity();
+            String newAvailability = selected.getAvailability();
 
-            // Check required fields
-            if (newName.isEmpty() || newQuantity < 0 || newPrice <= 0) {
-                JOptionPane.showMessageDialog(this, "Invalid input. Check all fields.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // --- Handle size for Drink/Dessert ---
-            if (selected instanceof Drink drink) {
-                if (newSize == null) {
-                    JOptionPane.showMessageDialog(this, "Please select a size for the drink.", "Error", JOptionPane.ERROR_MESSAGE);
+            for (Product p : productManager.getProducts()) {
+                if (!p.equals(selected) && p.getName().equalsIgnoreCase(newName)) {
+                    JOptionPane.showMessageDialog(this, "A product with this name already exists!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                if (!otherMethods.validateDrinkPrice(drink, newPrice, newSize, productManager.getProducts())) {
-                    JOptionPane.showMessageDialog(this, "Invalid price for the selected drink size!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            if (showAvailability) {
+                newAvailability = (String) availabilityBox.getSelectedItem();
+                newQuantity = newAvailability.equals("Available") ? 50 : 0;
+            } else {
+                try {
+                    newQuantity = Integer.parseInt(quantityField.getText().trim());
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Enter valid numeric quantity.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+
+            try {
+                newPrice = Double.parseDouble(priceField.getText().trim());
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Enter valid numeric price.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Handle size updates
+            if (selected instanceof Drink drink) {
+                if (newSize == null) {
+                    JOptionPane.showMessageDialog(this, "Select a size for the drink.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 drink.setDrinkSizes(newSize);
             } else if (selected instanceof Dessert dessert) {
                 if (newSize == null) {
-                    JOptionPane.showMessageDialog(this, "Please select a serving size for the dessert.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                if (!otherMethods.validateDessertPrice(dessert, newPrice, newSize, productManager.getProducts())) {
-                    JOptionPane.showMessageDialog(this, "Invalid price for the selected serving size!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Select a serving size for the dessert.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 dessert.setServingSize(newSize);
             }
 
-            // --- Update product fields ---
+            // Update product fields
             selected.setName(newName);
-            int diff = newQuantity - selected.getQuantity();
-            if (diff > 0) selected.restock(diff);
-            else if (diff < 0) selected.reduceQuantity(-diff);
+            selected.setQuantity(newQuantity);
+            selected.setAvailability(newAvailability);
             selected.setPrice(newPrice);
 
-            // --- Update database ---
+            // Update database
             ProductDAO productDAO = new ProductDAO();
             productDAO.updateProduct(selected);
-
             productManager.setProducts(productDAO.getAllProducts());
 
-            // --- Refresh JList sorted by quantity ---
-            List<Product> sortedProducts = otherMethods.sortByQuantity(productManager.getProducts());
+            // Refresh list
             productModel.clear();
-            for (Product p : sortedProducts) productModel.addElement(p);
+            for (Product p : otherMethods.sortByQuantity(productManager.getProducts())) {
+                productModel.addElement(p);
+            }
 
             JOptionPane.showMessageDialog(this, "Product updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             refreshLists();
         });
-
 
         backButton.addActionListener(e -> cards.show(cardPanel, "PRODUCT"));
 
@@ -1164,8 +1171,9 @@ public class AdminPanelGUI extends JFrame {
         boxPanel.add(productScroll);
         boxPanel.add(nameLabel);
         boxPanel.add(nameField);
-        boxPanel.add(quantityLabel);
+        boxPanel.add(qtyAvailLabel);
         boxPanel.add(quantityField);
+        boxPanel.add(availabilityBox);
         boxPanel.add(priceLabel);
         boxPanel.add(priceField);
         boxPanel.add(sizeLabel);
@@ -1176,6 +1184,7 @@ public class AdminPanelGUI extends JFrame {
         panel.add(boxPanel);
         return panel;
     }
+
 
     private JPanel createEditEquipmentPanel() {
         JPanel panel = new JPanel();

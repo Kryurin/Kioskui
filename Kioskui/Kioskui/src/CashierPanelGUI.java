@@ -113,11 +113,11 @@ public class CashierPanelGUI extends JFrame {
         catLabel.setFont(new Font("Consolas", Font.BOLD, 18));
         catLabel.setBounds(20, 10, 220, 30);
 
-        JButton foodBtn = createImageButton("assets/Meals.png", 50, 70, 150, 150);
-        JButton drinkBtn = createImageButton("assets/drinks.png", 50, 240, 150, 150);
-        JButton dessertBtn = createImageButton("assets/dessrt.png", 50, 420, 150, 150);
-        JButton equipmentBtn = createImageButton("assets/Equipment.png", 50, 590, 150, 150);
-        JButton customerMembershipButton = createStyledButton("Customer Membership", 30, 850);
+        JButton foodBtn = createImageButton("Kioskui/assets/Meals.png", 50, 70, 150, 150);
+        JButton drinkBtn = createImageButton("Kioskui/assets/drinks.png", 50, 250, 150, 150);
+        JButton dessertBtn = createImageButton("Kioskui/assets/dessrt.png", 50, 430, 150, 150);
+        JButton equipmentBtn = createImageButton("Kioskui/assets/Equipment.png", 50, 600, 150, 150);
+        JButton customerMembershipButton = createStyledButton("Customer Membership", 30, 780);
         customerMembershipButton.addActionListener(e -> showCustomerMemberships());
 
         leftBox.add(catLabel);
@@ -171,6 +171,7 @@ public class CashierPanelGUI extends JFrame {
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
 
+        // Product / Equipment List
         DefaultListModel<Object> itemListModel = new DefaultListModel<>();
         JList<Object> itemList = new JList<>(itemListModel);
         itemList.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -185,6 +186,7 @@ public class CashierPanelGUI extends JFrame {
 
         JButton addToOrderBtn = createStyledButton("Add to Order", 200, 325);
 
+        // Order Summary
         JLabel orderLabel = new JLabel("ORDER SUMMARY", SwingConstants.CENTER);
         orderLabel.setForeground(Color.WHITE);
         orderLabel.setFont(new Font("Consolas", Font.BOLD, 16));
@@ -196,6 +198,7 @@ public class CashierPanelGUI extends JFrame {
         orderScroll.setBounds(20, 410, 540, 250);
 
         JButton placeOrderBtn = createStyledButton("Place Order", 20, 680);
+        placeOrderBtn.addActionListener(e -> placeOrder());
         JButton cancelItemBtn = createStyledButton("Cancel Item", 300, 680);
 
         rightBox.add(productScroll);
@@ -207,35 +210,66 @@ public class CashierPanelGUI extends JFrame {
         rightBox.add(placeOrderBtn);
         rightBox.add(cancelItemBtn);
 
-        // Add to order
+        // ===== ADD TO ORDER =====
+// ===== ADD TO ORDER =====
         addToOrderBtn.addActionListener(e -> {
             Object sel = itemList.getSelectedValue();
-            if (sel == null) { JOptionPane.showMessageDialog(this, "Select an item to add.", "No Selection", JOptionPane.WARNING_MESSAGE); return; }
+            if (sel == null) {
+                JOptionPane.showMessageDialog(this, "Select an item to add.", "No Selection", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             int qty;
-            try { qty = Integer.parseInt(qtyField.getText().trim()); if (qty <= 0) throw new NumberFormatException(); }
-            catch (NumberFormatException ex) { JOptionPane.showMessageDialog(this, "Enter a valid quantity.", "Invalid Quantity", JOptionPane.ERROR_MESSAGE); return; }
+            try {
+                qty = Integer.parseInt(qtyField.getText().trim());
+                if (qty <= 0) throw new NumberFormatException();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Enter a valid quantity.", "Invalid Quantity", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             String line;
-            if (sel instanceof Product p) { line = qty + " x " + p.getName() + " - P" + String.format("%.2f", p.getPrice()) + " each"; selectedProducts.add(p); selectedQuantities.add(qty); }
-            else if (sel instanceof Equipment eq) { line = qty + " x " + eq.getName() + " - Free (Borrowed)"; selectedEquipments.add(eq); }
-            else return;
+            if (sel instanceof Product p) {
+                line = qty + " x " + p.getName() + " - P" + String.format("%.2f", p.getPrice()) + " each";
+                selectedProducts.add(p);
+                selectedQuantities.add(qty);
+            } else if (sel instanceof Equipment eq) {
+                line = qty + " x " + eq.getName() + " - Free (Borrowed)";
+                selectedEquipments.add(eq);
+            } else return;
 
-            placedOrderStack.push(line);
-            refreshOrderList();
+            placedOrderStack.push(line); // keep stack updated
+            refreshOrderList(); // refresh order summary
         });
 
-        // Place order
-        placeOrderBtn.addActionListener(e -> placeOrder());
-
-        // Cancel item
+// ===== CANCEL ITEM =====
         cancelItemBtn.addActionListener(e -> {
-            if (placedOrderStack.isEmpty()) { JOptionPane.showMessageDialog(this, "No items to cancel.", "Empty Order", JOptionPane.WARNING_MESSAGE); return; }
-            String removed = placedOrderStack.pop();
-            if (removed.contains(" - P")) { if (!selectedProducts.isEmpty() && !selectedQuantities.isEmpty()) { int idx = selectedProducts.size() - 1; selectedProducts.remove(idx); selectedQuantities.remove(idx); } }
-            else if (removed.contains(" (Borrowed)")) { if (!selectedEquipments.isEmpty()) selectedEquipments.remove(selectedEquipments.size() - 1); }
-            refreshOrderList();
+            int selectedIndex = orderList.getSelectedIndex();
+            if (selectedIndex == -1) {
+                JOptionPane.showMessageDialog(this, "Select an item to cancel.", "No Selection", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Stack is last-in-first-out, so map index from order list to stack
+            int stackIndex = placedOrderStack.size() - 1 - selectedIndex;
+            String removed = placedOrderStack.remove(stackIndex); // remove from stack
+
+            // Remove from selected lists based on type
+            if (removed.contains(" - P")) {
+                if (!selectedProducts.isEmpty() && selectedIndex < selectedProducts.size()) {
+                    selectedProducts.remove(selectedIndex);
+                    selectedQuantities.remove(selectedIndex);
+                }
+            } else if (removed.contains(" (Borrowed)")) {
+                if (!selectedEquipments.isEmpty() && selectedIndex < selectedEquipments.size()) {
+                    selectedEquipments.remove(selectedIndex);
+                }
+            }
+
+            refreshOrderList(); // update JList
             JOptionPane.showMessageDialog(this, "Cancelled: " + removed, "Item Cancelled", JOptionPane.INFORMATION_MESSAGE);
         });
+
 
         return rightBox;
     }
@@ -402,41 +436,57 @@ public class CashierPanelGUI extends JFrame {
             return;
         }
 
-        List<String> orderItems = new ArrayList<>();
-        for (int i = placedOrderStack.size() - 1; i >= 0; i--) orderItems.add(placedOrderStack.get(i));
-
         double total = 0;
-        for (int i = 0; i < selectedProducts.size(); i++) total += selectedProducts.get(i).getPrice() * selectedQuantities.get(i);
-
         StringBuilder errorMsg = new StringBuilder();
+
+        // Loop through selected products to check stock and calculate total
         for (int i = 0; i < selectedProducts.size(); i++) {
             Product p = selectedProducts.get(i);
             int qty = selectedQuantities.get(i);
             if (qty > p.getQuantity()) {
-                errorMsg.append("- ").append(p.getName()).append(": Requested ").append(qty).append(", Available ").append(p.getQuantity()).append("\n");
+                errorMsg.append("- ").append(p.getName())
+                        .append(": Requested ").append(qty)
+                        .append(", Available ").append(p.getQuantity()).append("\n");
+            } else {
+                total += p.getPrice() * qty;
             }
         }
+
         if (errorMsg.length() > 0) {
-            JOptionPane.showMessageDialog(this, "Some items exceed available stock:\n" + errorMsg, "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Some items exceed available stock:\n" + errorMsg,
+                    "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        for (int i = 0; i < selectedProducts.size(); i++) selectedProducts.get(i).reduceQuantity(selectedQuantities.get(i));
+        // Reduce product quantities
+        for (int i = 0; i < selectedProducts.size(); i++) {
+            Product p = selectedProducts.get(i);
+            int qty = selectedQuantities.get(i);
+            p.reduceQuantity(qty);
+        }
 
+        // Create order with current stack content
+        List<String> orderItems = new ArrayList<>(placedOrderStack); // copy stack as is
         Order order = new Order(orderItems, total);
+
         if (orderQueue.addOrder(order)) {
             KitchenPanelGUI kitchen = KitchenPanelGUI.getInstance(orderQueue);
             kitchen.setVisible(true);
             kitchen.toFront();
-            JOptionPane.showMessageDialog(this, "Order #" + order.getOrderId() + " sent to kitchen!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Order #" + order.getOrderId() + " sent to kitchen!",
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(this, "Kitchen queue is full! Order not sent.", "Queue Full", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Kitchen queue is full! Order not sent.",
+                    "Queue Full", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
+        // Clear everything after placing order
         placedOrderStack.clear();
         selectedProducts.clear();
         selectedQuantities.clear();
         selectedEquipments.clear();
         refreshOrderList();
     }
+
 }

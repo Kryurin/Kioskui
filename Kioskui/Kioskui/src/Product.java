@@ -3,11 +3,13 @@ public abstract class Product {
     private int id;
     private int quantity;
     private double price;
+    private String availability;
 
-    public Product(String name, int quantity, double price) {
+    public Product(String name, int quantity, double price, String availability) {
         this.name = name;
         this.quantity = quantity;
         this.price = price;
+        this.availability = availability;
     }
 
     public int getId() {
@@ -22,9 +24,12 @@ public abstract class Product {
         return quantity;
     }
 
-
     public double getPrice() {
         return price;
+    }
+
+    public String getAvailability() {
+        return availability;
     }
 
     public void setName(String name) {
@@ -41,6 +46,10 @@ public abstract class Product {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public void setAvailability(String availability) {
+        this.availability = availability;
     }
 
     public int restock(int productQty){
@@ -63,11 +72,11 @@ public abstract class Product {
 
     @Override
     public String toString() {
-        return "Name: " + name + "\nQuantity: " + quantity + "\nPrice: P" + String.format("%.2f", price);
+        return toListString();
     }
 
     public String toListString() {
-        return name + " (Qty: " + quantity + ", P" + String.format("%.2f", price) + ")";
+        return name + " (Qty: " + quantity + ", P" + String.format("%.2f", price) + ")" + ", Availability: " + availability;
     }
 
 }

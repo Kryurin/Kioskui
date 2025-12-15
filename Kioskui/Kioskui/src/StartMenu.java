@@ -26,7 +26,7 @@ public class StartMenu extends JFrame {
         tabPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Admin button on the left
-        ImageIcon icon = new ImageIcon("assets/adminicon.png");
+        ImageIcon icon = new ImageIcon("Kioskui/assets/adminicon.png");
         Image img = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         icon = new ImageIcon(img);
         JButton adminBtn = new JButton(icon);

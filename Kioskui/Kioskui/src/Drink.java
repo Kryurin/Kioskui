@@ -3,8 +3,8 @@ public class Drink extends Product {
     private String drinkSizes;
 
 
-    public Drink(String name, int quantity, double price, String drinkType , String drinkSizes) {
-        super(name, quantity, price);
+    public Drink(String name, int quantity, double price, String availability, String drinkType ,String drinkSizes) {
+        super(name, quantity, price, availability);
         this.drinkType = drinkType;
         this.drinkSizes = drinkSizes;
     }
@@ -25,13 +25,10 @@ public class Drink extends Product {
         this.drinkSizes = drinkSizes;
     }
 
-    public String toString() {
-        return super.toString() + "\n Drink Type: " + drinkType + "\nDrink Sizes: " + drinkSizes + "\n";
-    }
 
     @Override
     public String toListString() {
-        return super.toListString() + ", Drink Type: " + drinkType + ", Drink Sizes: " + drinkSizes;
+        return super.toListString() + ", Drink Type: " + drinkType + ", Drink Sizes: " + drinkSizes + "\n";
     }
 }
 
